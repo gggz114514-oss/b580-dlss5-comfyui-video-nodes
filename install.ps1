@@ -33,13 +33,28 @@ foreach ($asset in $manifest.assets) {
     if ($uri.Scheme -ne 'https' -or $uri.Host -ne 'github.com') { throw 'Unexpected runtime asset host' }
     if ([IO.Path]::GetFileName($asset.name) -ne $asset.name) { throw 'Invalid asset filename' }
     $archive = Join-Path $stagingRoot $asset.name
-    if ($AssetDirectory) {
-        Write-Host ('Using local archive ' + $asset.name)
-        Copy-Item -LiteralPath (Join-Path $AssetDirectory $asset.name) -Destination $archive
-    } else {
-        Write-Host ('Downloading ' + $asset.name)
-        Invoke-WebRequest -Uri $asset.url -OutFile $archive -UseBasicParsing
-    }
+    $pieces = @($asset)
+    if ($asset.parts) { $pieces = @($asset.parts) }
+    $joined = [IO.File]::Create($archive)
+    try {
+        foreach ($piece in $pieces) {
+            $pieceUri = [uri]$piece.url
+            if ($pieceUri.Scheme -ne 'https' -or $pieceUri.Host -ne 'github.com' -or
+                [IO.Path]::GetFileName($piece.name) -ne $piece.name) { throw 'Invalid runtime part' }
+            $partPath = Join-Path $stagingRoot ($piece.name + '.download')
+            if ($AssetDirectory) {
+                Write-Host ('Using local part ' + $piece.name)
+                Copy-Item -LiteralPath (Join-Path $AssetDirectory $piece.name) -Destination $partPath
+            } else {
+                Write-Host ('Downloading ' + $piece.name)
+                Invoke-WebRequest -Uri $piece.url -OutFile $partPath -UseBasicParsing
+            }
+            if ((Get-ArchiveSha256 $partPath) -ne $piece.sha256) { throw ('Part checksum mismatch: ' + $piece.name) }
+            $partStream = [IO.File]::OpenRead($partPath)
+            try { $partStream.CopyTo($joined) } finally { $partStream.Dispose() }
+            Remove-Item -LiteralPath $partPath
+        }
+    } finally { $joined.Dispose() }
     if ((Get-ArchiveSha256 $archive) -ne $asset.sha256) {
         throw ('Runtime archive checksum mismatch: ' + $asset.name)
     }

@@ -25,13 +25,13 @@ Intel Arc B580 上的实验性 NR 视频节点：精确计算后端，以及画�
 
 1. 下载本仓库 ZIP，解压到 `ComfyUI/custom_nodes/b580-dlss5-comfyui-video-nodes`，确保目录内能看到 `__init__.py` 和 `Install.bat`。
 2. 如果有旧的 `NR-B580-Local`，先禁用旧节点，避免同名注册。
-3. 双击 `Install.bat`。它下载并校验三份运行包，以及固定版本的上游模型资源；安装到节点目录的 `.runtime`。需要网络访问 GitHub。
+3. 双击 `Install.bat`。它自动下载29个小分片，校验后重组为三份运行包，以及固定版本的上游模型资源；安装到节点目录的 `.runtime`。需要网络访问 GitHub。
 4. 重启 ComfyUI，搜索 **NR B580**。连接 **Load Video → NR 节点 → Save Video**，在 Load Video 上传输入文件。
 5. 可导入 `examples/single-nr-workflow.json` 或 `examples/nr-sr-fg-workflow.json`，再选自己的视频。另有 `*-api.json` 供 API 调用。画布模板已检查连接结构，尚未在全部前端版本中验收。
 
 没有安装时节点会明确提示运行安装器。可选的 `config.json` / `NR_COMFY_CONFIG` 供高级用户覆盖运行位置与输出目录，普通安装无需填写。任务文件默认保存在 `.runtime/jobs`，Save Video 可另存到 ComfyUI 输出目录。
 
-手动下载 Release 的三份 runtime ZIP 后，也可执行 `powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -AssetDirectory "D:\下载的运行包"`；仍会校验附件，模型资源首次需要联网。升级时请使用新的节点目录，安装器不会覆盖已有 `.runtime`。搬动目录后见 [便携说明](docs/PORTABLE.md)。
+手动下载 Release 的全部 `.zip.partXX` 分片到同一目录后，也可执行 `powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -AssetDirectory "D:\下载的运行包"`；仍会校验附件，模型资源首次需要联网。升级时请使用新的节点目录，安装器不会覆盖已有 `.runtime`。搬动目录后见 [便携说明](docs/PORTABLE.md)。
 
 ## 当前限制
 
