@@ -1,0 +1,7 @@
+{
+  "prompt": {
+    "1": {"class_type": "LoadVideo", "inputs": {"file": "input.mp4"}},
+    "2": {"class_type": "NRB580Video", "inputs": {"video": ["1", 0], "mode": "精确版"}},
+    "3": {"class_type": "SaveVideo", "inputs": {"video": ["2", 0], "filename_prefix": "video/NR", "format": "auto", "codec": "auto"}}
+  }
+}

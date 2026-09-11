@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+config.json
+*.log
+*.dll
+*.pyd
+*.bin
+*.safetensors
+*.mp4
+jobs/
+models/
+.venv/

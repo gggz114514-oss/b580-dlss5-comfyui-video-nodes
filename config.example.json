@@ -1,0 +1,6 @@
+{
+  "python": "D:/NR-runtime/python/python.exe",
+  "runner": "D:/NR-runtime/product/comfy/runner.py",
+  "gpu_lease": "D:/NR-runtime/reference/gpu_lease_nr.py",
+  "jobs_dir": "D:/NR-output/jobs"
+}
