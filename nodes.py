@@ -15,9 +15,18 @@ MODES = {'精确版': 'exact', '快速版（类 DLSS5）': 'fast'}
 
 def load_config():
     path = Path(os.environ.get('NR_COMFY_CONFIG', str(ROOT / 'config.json')))
-    if not path.is_file():
-        raise RuntimeError('NR 后端尚未配置。请参照本节点 README 和 config.example.json；仅安装节点不会下载后端或模型。')
-    config = json.loads(path.read_text(encoding='utf-8-sig'))
+    if path.is_file():
+        config = json.loads(path.read_text(encoding='utf-8-sig'))
+    elif 'NR_COMFY_CONFIG' in os.environ:
+        raise FileNotFoundError(f'NR_COMFY_CONFIG 指定的配置不存在：{path}')
+    else:
+        runtime = ROOT / '.runtime'
+        if not (runtime / 'data/installed-at.txt').is_file():
+            raise RuntimeError('NR 运行包尚未安装。请在本节点目录双击 Install.bat，完成后重启 ComfyUI。')
+        config = dict(python=str(runtime / 'python/python.exe'),
+                      runner=str(runtime / 'runner.py'),
+                      gpu_lease=str(runtime / 'gpu_lease_nr.py'),
+                      jobs_dir=str(runtime / 'jobs'))
     for key in ('python', 'runner', 'gpu_lease', 'jobs_dir'):
         value = Path(config[key]).expanduser()
         if not value.is_absolute():
@@ -86,7 +95,7 @@ class NRB580Video:
     RETURN_NAMES = ('video', '文件路径')
     FUNCTION = 'execute'
     CATEGORY = 'NR B580'
-    DESCRIPTION = '实验版，需要单独配置 NR GPU 后端。快速版为类 DLSS5，画面与精确版有明显差异。'
+    DESCRIPTION = '实验版，先运行节点目录的 Install.bat。快速版为类 DLSS5，画面与精确版有明显差异。'
 
     def execute(self, video, mode):
         return execute_video(video, mode, False)
@@ -100,7 +109,7 @@ class NRB580XeSSVideo(NRB580Video):
                                                    'step': 0.01, 'tooltip': '1× 为 XeSS AA；1×、2×已测试，其他倍率由 SDK 校验。'})
         return inputs
 
-    DESCRIPTION = 'NR → XeSS SR → FG。需要单独配置 GPU Block 后端；FG 输出 2N−1 帧。'
+    DESCRIPTION = 'NR → XeSS SR → FG，共用 GPU Block；FG 输出 2N−1 帧。先运行节点目录的 Install.bat。'
 
     def execute(self, video, mode, sr_scale):
         return execute_video(video, mode, True, sr_scale)

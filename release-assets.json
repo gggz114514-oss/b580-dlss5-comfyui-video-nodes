@@ -1,0 +1,23 @@
+{
+  "version": "v0.2.0-pre",
+  "assets": [
+    {
+      "name": "nr-b580-runtime-v0.2.0-pre-python.zip",
+      "bytes": 1361323826,
+      "sha256": "97f2a0dd547179f67bacf4fa2a19e76a49424cbcad447517067fe6107cbe43b7",
+      "url": "https://github.com/gggz114514-oss/b580-dlss5-comfyui-video-nodes/releases/download/v0.2.0-pre/nr-b580-runtime-v0.2.0-pre-python.zip"
+    },
+    {
+      "name": "nr-b580-runtime-v0.2.0-pre-toolchain.zip",
+      "bytes": 125622313,
+      "sha256": "6447069bc2598b02ab872ec3fd0d3879b933532a92f03228f055aca44f72df36",
+      "url": "https://github.com/gggz114514-oss/b580-dlss5-comfyui-video-nodes/releases/download/v0.2.0-pre/nr-b580-runtime-v0.2.0-pre-toolchain.zip"
+    },
+    {
+      "name": "nr-b580-runtime-v0.2.0-pre-backend.zip",
+      "bytes": 371997958,
+      "sha256": "33f1beb58000e600f9b287fe8675ee2c0f87d08402f0dc78d64990b0e8315194",
+      "url": "https://github.com/gggz114514-oss/b580-dlss5-comfyui-video-nodes/releases/download/v0.2.0-pre/nr-b580-runtime-v0.2.0-pre-backend.zip"
+    }
+  ]
+}

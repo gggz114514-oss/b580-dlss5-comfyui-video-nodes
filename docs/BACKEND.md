@@ -2,7 +2,7 @@
 
 节点仅负责 ComfyUI VIDEO 输入输出和进程生命周期。推理不在 ComfyUI 主进程内执行，ComfyUI 自动模型补丁不会自动作用于 NR。
 
-配置的 `gpu_lease` 接收 `--owner ID --cwd DIR --log FILE --timeout-seconds 1800 --wait-seconds 0 -- PYTHON RUNNER --request FILE`，负责互斥与超时终止进程树。此脚本与 runner 均须由兼容后端提供，本仓库不提供替代的推理实现。
+配置的 `gpu_lease` 接收 `--owner ID --cwd DIR --log FILE --timeout-seconds 1800 --wait-seconds 0 -- PYTHON RUNNER --request FILE`，负责互斥与超时终止进程树。此脚本与 runner 随 Release 运行包安装；节点默认自动发现 .runtime。
 
 请求 JSON：
 

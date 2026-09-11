@@ -2,7 +2,9 @@
 
 Intel Arc B580 上的实验性 NR 视频节点：精确计算后端，以及画面有差异的快速“类 DLSS5”后端，可串联 XeSS SR 和 FG。
 
-**当前发布的是节点源码与阶段成果记录，不是完整运行包。NR 后端、模型权重、预编译内核及原生 GPU worker 尚未随仓库分发。只有本仓库，不能完成视频推理。** 后端没有公开下载地址或自动安装器；下面的配置示例不能替代这些依赖。
+**v0.2.0-pre 提供完整后端运行包与安装器。** 将节点放进 ComfyUI 的 custom_nodes，运行 `Install.bat`，重启后即可连接 VIDEO 节点。安装器自动获取独立 Python、Torch/XPU、Triton、预编译内核、GPU worker 和固定版本模型资源，不需要手动配置开发路径或安装编译器。
+
+[下载预发布版本](https://github.com/gggz114514-oss/b580-dlss5-comfyui-video-nodes/releases/tag/v0.2.0-pre)。运行包约 1.86 GB，建议预留至少 12 GB 安装及工作空间。目标为 Windows x64 / Intel Arc B580；硬件和驱动仍受已验证缓存约束。
 
 本项目不是 NVIDIA 官方 DLSS 产品，也不属于 NVIDIA、Intel 或 ComfyUI 官方项目。仓库名称用于说明实验方向，不代表认证或授权。
 
@@ -17,19 +19,19 @@ Intel Arc B580 上的实验性 NR 视频节点：精确计算后端，以及画�
 
 1× SR 实际运行 XeSS AA。FG 输出帧率为输入的两倍、帧数为 `2N−1`，不补造末尾重复帧。GPU Block 提供原始帧运动信息；增强画面不覆盖下一次运动估计所需的原始颜色历史。NR/SR/FG 中间不通过 CPU 像素管道或中间视频传递。
 
-## 安装节点源码
+## 安装与使用
 
-需要 Windows、带 VIDEO API 的 ComfyUI，以及**另行准备好的兼容 NR 后端**。本地验证环境为 Python 3.13 / PyTorch 2.13.0+xpu / Intel Arc B580。
+需要 Windows x64、Intel Arc B580，以及有 Load Video / Save Video / VIDEO API 的 ComfyUI。独立后端随包提供，不改 ComfyUI 的 Python 环境。
 
-1. 将仓库放入 `ComfyUI/custom_nodes/b580-dlss5-comfyui-video-nodes`。
-2. 如果已安装早期 `NR-B580-Local`，先禁用该旧节点目录，避免同名节点重复注册。
-3. 将 `config.example.json` 复制为 `config.json`，填写已有后端的 Python、runner、GPU 租约脚本和输出目录。也可以用环境变量 `NR_COMFY_CONFIG` 指定配置文件。当前后端本身仍有本机路径依赖，修改这四项不等于完整后端已可搬迁。
-4. 重启 ComfyUI，搜索 **NR B580**。
-5. 连接 **Load Video → NR 节点 → Save Video**。Load Video 裁剪起点、时长都设为 0；使用 VIDEO 插口，不是 IMAGE 批次。
+1. 下载本仓库 ZIP，解压到 `ComfyUI/custom_nodes/b580-dlss5-comfyui-video-nodes`，确保目录内能看到 `__init__.py` 和 `Install.bat`。
+2. 如果有旧的 `NR-B580-Local`，先禁用旧节点，避免同名注册。
+3. 双击 `Install.bat`。它下载并校验三份运行包，以及固定版本的上游模型资源；安装到节点目录的 `.runtime`。需要网络访问 GitHub。
+4. 重启 ComfyUI，搜索 **NR B580**。连接 **Load Video → NR 节点 → Save Video**，在 Load Video 上传输入文件。
+5. 可导入 `examples/single-nr-workflow.json` 或 `examples/nr-sr-fg-workflow.json`，再选自己的视频。另有 `*-api.json` 供 API 调用。画布模板已检查连接结构，尚未在全部前端版本中验收。
 
-没有配置时节点会明确提示缺少后端，不会下载模型、修改系统运行库或静默切换其他算法。
+没有安装时节点会明确提示运行安装器。可选的 `config.json` / `NR_COMFY_CONFIG` 供高级用户覆盖运行位置与输出目录，普通安装无需填写。任务文件默认保存在 `.runtime/jobs`，Save Video 可另存到 ComfyUI 输出目录。
 
-`examples/` 提供 POST `/prompt` 的 API JSON 示例（不是可拖入画布的 UI 工作流）。先将输入视频放到 ComfyUI input 目录并改写示例文件名。
+手动下载 Release 的三份 runtime ZIP 后，也可执行 `powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -AssetDirectory "D:\下载的运行包"`；仍会校验附件，模型资源首次需要联网。升级时请使用新的节点目录，安装器不会覆盖已有 `.runtime`。搬动目录后见 [便携说明](docs/PORTABLE.md)。
 
 ## 当前限制
 
@@ -43,6 +45,4 @@ Intel Arc B580 上的实验性 NR 视频节点：精确计算后端，以及画�
 
 ## 阶段成果与后续
 
-见 [阶段验证](docs/VALIDATION.md)、[后端接口](docs/BACKEND.md) 和 [运行环境隔离](docs/RUNTIME.md)。当前本机版实际运行过完整 ComfyUI 视频链路；本仓库的可配置适配层另做了 CPU 导入/配置检查，不能替代干净机器的完整安装验收。
-
-后续重点是整理可分发后端、依赖与模型获取方式、构建指纹、兼容性检查，并在干净机器复测。不会把本机成功描述成所有用户开箱即用。
+见 [阶段验证](docs/VALIDATION.md)、[后端接口](docs/BACKEND.md)、[便携说明](docs/PORTABLE.md) 和 [运行环境隔离](docs/RUNTIME.md)。本机已从 ZIP 在独立中文路径完成安装、模型获取、默认节点发现及完整视频验证；这不等于其他电脑或任意驱动已验证。
